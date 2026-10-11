@@ -35,9 +35,8 @@ spec:
     app: app-1
   ports:
     - protocol: TCP
-      port: 80 # service port
-      targetPort: 80 # container port
----
+      port: 80 # service port use for Other apps inside our cluster talk to the Service on port 80.
+      targetPort: 80 # container port use for Service forwards that traffic straight to port 80 inside joindevops/app1 container
 #it creates a Load Balancer ingress
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -52,14 +51,89 @@ metadata:
     alb.ingress.kubernetes.io/group.name: roboshop
 spec:
   ingressClassName: alb
-  rules:
-  - host: "app1.srikanth865.online"
+  rules: # its oour routing rules
+  - host: "app1.srikanth865.online"  #its our DNS name
     http:
       paths:
       - pathType: Prefix
-        path: "/"
-        backend:
+        path: "/"  #tells the load balancer to match any URL path that starts with a forward slash (/). Because it is a prefix match for /, it essentially catches all incoming traffic sent to this domain (app1.srikanth865.online)
+        backend: #This defines the destination where the ALB should send the matched traffic inside the cluster.
           service:
-            name: app-1
+            name: app-1 #This points to a Kubernetes Service named app-1. The AWS Load Balancer Controller will look at the Pods connected to this Service and automatically register their IP addresses into the AWS ALB's Target Group.
             port:
               number: 80
+
+## outputs 
+##### kubectl describe pod app-1
+
+# Name:             app-1-66c8fd658f-sn4sq
+# Namespace:        roboshop
+# Priority:         0
+# Service Account:  default
+# Node:             ip-192-168-32-229.ec2.internal/192.168.32.229
+# Start Time:       Sun, 11 Oct 2026 08:28:06 +0000
+# Labels:           app=app-1
+#                   pod-template-hash=66c8fd658f
+# Annotations:      <none>
+# Status:           Running
+# IP:               192.168.56.4
+# IPs:
+#   IP:           192.168.56.4
+
+# ####  kubectl describe pod app-2
+
+
+# Name:             app-2-76fb466f58-nft7q
+# Namespace:        roboshop
+# Priority:         0
+# Service Account:  default
+# Node:             ip-192-168-26-100.ec2.internal/192.168.26.100
+# Start Time:       Sun, 11 Oct 2026 08:48:47 +0000
+# Labels:           app=app-2
+#                   pod-template-hash=76fb466f58
+# Annotations:      <none>
+# Status:           Running
+# IP:               192.168.22.30
+# IPs:
+#   IP:           192.168.22.30
+
+
+
+# [ ec2-user@ip-172-31-47-10 ~/k8-ingress ]$ kubectl describe service app-1  
+# Name:                     app-1
+# Namespace:                roboshop
+# Labels:                   app=app-1
+# Annotations:              <none>
+# Selector:                 app=app-1
+# Type:                     ClusterIP
+# IP Family Policy:         SingleStack
+# IP Families:              IPv4
+# IP:                       10.100.237.137
+# IPs:                      10.100.237.137
+# Port:                     <unset>  80/TCP
+# TargetPort:               80/TCP
+
+# Endpoints:                192.168.56.4:80,   <<<app-1
+#                           192.168.5.188:80   <<app-2
+# Session Affinity:         None
+# Internal Traffic Policy:  Cluster
+
+
+
+# [ ec2-user@ip-172-31-47-10 ~/k8-ingress ]$ kubectl describe service app-2
+# Name:                     app-2
+# Namespace:                roboshop
+# Labels:                   app=app-2
+# Annotations:              <none>
+# Selector:                 app=app-2
+# Type:                     ClusterIP
+# IP Family Policy:         SingleStack
+# IP Families:              IPv4
+# IP:                       10.100.54.129
+# IPs:                      10.100.54.129
+# Port:                     <unset>  80/TCP
+# TargetPort:               80/TCP
+# Endpoints:                192.168.56.188:80,192.168.22.30:80
+# Session Affinity:         None
+# Internal Traffic Policy:  Cluster
+# Events:                   <none>
