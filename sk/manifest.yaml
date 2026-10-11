@@ -1,1 +1,21 @@
-FROM nginx
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: srikanth
+  # labels related to deployment resource
+  labels:
+    app: srikanth
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: srikanth
+  # Pod
+  template:
+    metadata:
+      labels:
+        app: srikanth
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
