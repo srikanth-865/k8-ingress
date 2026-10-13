@@ -62,3 +62,9 @@ spec:
             name: app-2
             port:
               number: 80
+
+####
+
+# “The Service selects Pods using labels and maintains their endpoints. 
+# The AWS Load Balancer Controller uses the Ingress and Service configuration to register Pod IPs i
+# n the ALB target group because we use IP target mode. The ALB then forwards incoming traffic directly to the application Pods.”
