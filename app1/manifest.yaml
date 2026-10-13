@@ -38,6 +38,7 @@ spec:
       port: 80 # service port use for Other apps inside our cluster talk to the Service on port 80.
       targetPort: 80 # container port use for Service forwards that traffic straight to port 80 inside joindevops/app1 container
 #it creates a Load Balancer ingress
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
