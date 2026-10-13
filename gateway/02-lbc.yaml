@@ -8,6 +8,7 @@ spec:
   ipAddressType: ipv4
   listenerConfigurations:
   - protocolPort: HTTPS:443
-    certificates: arn:aws:acm:us-east-1:349627593718:certificate/30b030dd-364d-494a-91df-837bcd46b499
+    certificates: 
+     - arn:aws:acm:us-east-1:349627593718:certificate/30b030dd-364d-494a-91df-837bcd46b499
 
 # We are going to use ALB, Listener
